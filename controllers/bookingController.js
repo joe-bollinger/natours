@@ -3,14 +3,14 @@ const Tour = require('../models/tourModel');
 const Booking = require('../models/bookingModel');
 const catchAsync = require('../utils/catchAsync');
 const factory = require('./handlerFactory.js');
-// const AppError = require('../utils/appError');
 
 exports.getCheckoutSession = catchAsync(async (req, res, next) => {
   // 1) Get the currently booked tour
   const tour = await Tour.findById(req.params.tourId);
+  // console.log(tour);
 
   // 2) Create checkout session
-  const session = stripe.checkout.sessions.create({
+  const session = await stripe.checkout.sessions.create({
     payment_method_types: ['card'],
     success_url: `${req.protocol}://${req.get('host')}/?tour=${
       req.params.tourId
@@ -22,9 +22,9 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
       {
         name: `${tour.name} Tour`,
         description: tour.summary,
-        images: [`http://natours.dev/img/tours/${tour.coverImage}`],
+        images: [`https://www.natours.dev/img/tours/${tour.imageCover}`],
         amount: tour.price * 100,
-        currency: 'USD',
+        currency: 'usd',
         quantity: 1,
       },
     ],
@@ -38,6 +38,7 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
 });
 
 exports.createBookingCheckout = catchAsync(async (req, res, next) => {
+  // This is only temporary, because it's unsecure, everyone can make bookings without paying
   const { tour, user, price } = req.query;
 
   if (!tour && !user && !price) return next();

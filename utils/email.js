@@ -16,7 +16,7 @@ module.exports = class Email {
       return nodemailer.createTransport({
         service: 'SendGrid',
         auth: {
-          user: process.env.SENDGRID_USER,
+          user: process.env.SENDGRID_USERNAME,
           pass: process.env.SENDGRID_PASSWORD,
         },
       });
@@ -59,9 +59,10 @@ module.exports = class Email {
   async sendWelcome() {
     await this.send('welcome', 'Welcome to the Natours family!');
   }
+
   async sendPasswordRest() {
     await this.send(
-      'passwordRest',
+      'passwordReset',
       'Your password reset token (Only valid for ten minutes)'
     );
   }

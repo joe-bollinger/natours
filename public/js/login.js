@@ -3,10 +3,11 @@ import axios from 'axios';
 import { showAlert } from './alerts';
 
 export const login = async (email, password) => {
+  console.log(email, password);
   try {
     const res = await axios({
       method: 'POST',
-      url: '/api/v1/users/login',
+      url: 'http://127.0.0.1:8000/api/v1/users/login',
       data: { email, password },
     });
 
@@ -23,12 +24,12 @@ export const login = async (email, password) => {
 
 export const logout = async () => {
   try {
-    const response = await axios({
+    const res = await axios({
       method: 'GET',
-      url: '/api/v1/users/logout',
+      url: 'http://127.0.0.1:8000/api/v1/users/logout',
     });
     if (res.data.status === 'success') location.reload(true);
   } catch (err) {
-    showAlert('error', 'Error occurred while logging out. Please try again.');
+    showAlert('error', 'Error logging out! Please try again.');
   }
 };

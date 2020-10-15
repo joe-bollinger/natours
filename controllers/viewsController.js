@@ -24,7 +24,7 @@ exports.getTour = catchAsync(async (req, res, next) => {
   });
 
   if (!tour) {
-    return new AppError('There is no tour with that name.', 404);
+    return next(new AppError('There is no tour with that name.', 404));
   }
 
   // 2) Build template

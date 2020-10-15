@@ -59,7 +59,7 @@ const tourSchema = mongoose.Schema(
     summary: {
       type: String,
       trim: true,
-      required: [true, 'A tour must have a summary.'],
+      required: [true, 'A tour must have a description.'],
     },
     description: {
       type: String,
@@ -101,10 +101,15 @@ const tourSchema = mongoose.Schema(
         coordinates: [Number],
         address: String,
         description: String,
+        day: Number,
       },
     ],
-    guides: [{ type: mongoose.Schema.ObjectId, ref: 'User' }],
-    // reviews: [{ type: mongoose.Schema.ObjectId, ref: 'Review' }],
+    guides: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: 'User',
+      },
+    ],
   },
   {
     toJSON: { virtuals: true },
@@ -121,6 +126,7 @@ tourSchema.virtual('durationWeeks').get(function () {
   return this.duration / 7;
 });
 
+// Virtual populate
 tourSchema.virtual('reviews', {
   ref: 'Review',
   foreignField: 'tour',
@@ -134,11 +140,8 @@ tourSchema.pre('save', function (next) {
 });
 
 // tourSchema.pre('save', async function (next) {
-//   const guidesPromises = this.guides.map(async (id) => {
-//     await User.findById(id);
-//   });
+//   const guidesPromises = this.guides.map(async (id) => await User.findById(id););
 //   this.guides = await Promise.all(guidesPromises);
-
 //   next();
 // });
 

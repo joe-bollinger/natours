@@ -8445,7 +8445,7 @@ exports.showAlert = exports.hideAlert = void 0;
 /* eslint-disable */
 var hideAlert = function hideAlert() {
   var el = document.querySelector('.alert');
-  if (el) e.parentElement.removeChild(el);
+  if (el) el.parentElement.removeChild(el);
 }; // Type is either 'success' or 'error'
 
 
@@ -8455,7 +8455,7 @@ var showAlert = function showAlert(type, msg) {
   hideAlert();
   var markup = "<div class=\"alert alert--".concat(type, "\">").concat(msg, "</div>");
   document.querySelector('body').insertAdjacentHTML('afterbegin', markup);
-  setTimeout(hideAlert, 5000);
+  window.setTimeout(hideAlert, 5000);
 };
 
 exports.showAlert = showAlert;
@@ -8479,47 +8479,47 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
 var login = /*#__PURE__*/function () {
   var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(email, password) {
-    var _res;
-
+    var res;
     return regeneratorRuntime.wrap(function _callee$(_context) {
       while (1) {
         switch (_context.prev = _context.next) {
           case 0:
-            _context.prev = 0;
-            _context.next = 3;
+            console.log(email, password);
+            _context.prev = 1;
+            _context.next = 4;
             return (0, _axios.default)({
               method: 'POST',
-              url: '/api/v1/users/login',
+              url: 'http://127.0.0.1:8000/api/v1/users/login',
               data: {
                 email: email,
                 password: password
               }
             });
 
-          case 3:
-            _res = _context.sent;
+          case 4:
+            res = _context.sent;
 
-            if (_res.data.status === 'success') {
+            if (res.data.status === 'success') {
               (0, _alerts.showAlert)('success', 'Logged in successfully.');
               window.setTimeout(function () {
                 location.assign('/');
               }, 1500);
             }
 
-            _context.next = 10;
+            _context.next = 11;
             break;
 
-          case 7:
-            _context.prev = 7;
-            _context.t0 = _context["catch"](0);
+          case 8:
+            _context.prev = 8;
+            _context.t0 = _context["catch"](1);
             (0, _alerts.showAlert)('error', _context.t0.response.data.message);
 
-          case 10:
+          case 11:
           case "end":
             return _context.stop();
         }
       }
-    }, _callee, null, [[0, 7]]);
+    }, _callee, null, [[1, 8]]);
   }));
 
   return function login(_x, _x2) {
@@ -8531,7 +8531,7 @@ exports.login = login;
 
 var logout = /*#__PURE__*/function () {
   var _ref2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2() {
-    var response;
+    var res;
     return regeneratorRuntime.wrap(function _callee2$(_context2) {
       while (1) {
         switch (_context2.prev = _context2.next) {
@@ -8540,11 +8540,11 @@ var logout = /*#__PURE__*/function () {
             _context2.next = 3;
             return (0, _axios.default)({
               method: 'GET',
-              url: '/api/v1/users/logout'
+              url: 'http://127.0.0.1:8000/api/v1/users/logout'
             });
 
           case 3:
-            response = _context2.sent;
+            res = _context2.sent;
             if (res.data.status === 'success') location.reload(true);
             _context2.next = 10;
             break;
@@ -8552,7 +8552,7 @@ var logout = /*#__PURE__*/function () {
           case 7:
             _context2.prev = 7;
             _context2.t0 = _context2["catch"](0);
-            (0, _alerts.showAlert)('error', 'Error occurred while logging out. Please try again.');
+            (0, _alerts.showAlert)('error', 'Error logging out! Please try again.');
 
           case 10:
           case "end":
@@ -8595,7 +8595,7 @@ var updateSettings = /*#__PURE__*/function () {
         switch (_context.prev = _context.next) {
           case 0:
             _context.prev = 0;
-            url = type === 'password' ? '/api/v1/users/updateMyPassword' : '/api/v1/users/updateMe';
+            url = type === 'password' ? 'http://127.0.0.1:8000/api/v1/users/updateMyPassword' : 'http://127.0.0.1:8000/api/v1/users/updateMe';
             _context.next = 4;
             return (0, _axios.default)({
               method: 'PATCH',
@@ -8608,9 +8608,6 @@ var updateSettings = /*#__PURE__*/function () {
 
             if (res.data.status === 'success') {
               (0, _alerts.showAlert)('success', "".concat(type.toUpperCase(), " updated successfully."));
-              window.setTimeout(function () {
-                location.assign('/');
-              }, 1500);
             }
 
             _context.next = 11;
@@ -8664,31 +8661,33 @@ var bookTour = /*#__PURE__*/function () {
           case 0:
             _context.prev = 0;
             _context.next = 3;
-            return (0, _axios.default)("/api/v1/bookings/checkout-session/".concat(tourId));
+            return (0, _axios.default)("http://127.0.0.1:8000/api/v1/bookings/checkout-session/".concat(tourId));
 
           case 3:
             session = _context.sent;
-            _context.next = 6;
-            return stripe.redirectToCheck({
+            console.log(session); // Create checkout form and charge credit card
+
+            _context.next = 7;
+            return stripe.redirectToCheckout({
               sessionId: session.data.session.id
             });
 
-          case 6:
-            _context.next = 12;
+          case 7:
+            _context.next = 13;
             break;
 
-          case 8:
-            _context.prev = 8;
+          case 9:
+            _context.prev = 9;
             _context.t0 = _context["catch"](0);
             console.log(_context.t0);
             (0, _alerts.showAlert)('error', _context.t0);
 
-          case 12:
+          case 13:
           case "end":
             return _context.stop();
         }
       }
-    }, _callee, null, [[0, 8]]);
+    }, _callee, null, [[0, 9]]);
   }));
 
   return function bookTour(_x) {
@@ -8972,8 +8971,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 var mapbox = document.getElementById('map');
 var loginForm = document.querySelector('.form--login');
 var logOutBtn = document.querySelector('.nav__el--logout');
-var userDataForm = document.querySelect('.form-user-data');
-var userPasswordForm = document.querySelect('.form-user-password');
+var userDataForm = document.querySelector('.form-user-data');
+var userPasswordForm = document.querySelector('.form-user-password');
 var bookBtn = document.getElementById('book-tour'); // DELEGATION
 
 if (mapbox) {
@@ -8981,70 +8980,61 @@ if (mapbox) {
   (0, _mapbox.displayMap)(locations);
 }
 
-if (loginForm) {
-  loginForm.addEventListener('submit', function (event) {
-    event.preventDefault();
-    var email = document.getElementById('email').value;
-    var password = document.getElementById('password').value;
-    (0, _login.login)(email, password);
-  });
-}
+if (loginForm) loginForm.addEventListener('submit', function (event) {
+  event.preventDefault();
+  var email = document.getElementById('email').value;
+  var password = document.getElementById('password').value;
+  (0, _login.login)(email, password);
+});
+if (logOutBtn) logOutBtn.addEventListener('click', _login.logout);
+if (userDataForm) userDataForm.addEventListener('submit', function (event) {
+  event.preventDefault();
+  var form = new FormData();
+  form.append('name', document.getElementById('name').value);
+  form.append('email', document.getElementById('email').value);
+  form.append('photo', document.getElementById('photo').files[0]);
+  (0, _updateSettings.updateSettings)(form, 'data');
+});
+if (userPasswordForm) userPasswordForm.addEventListener('submit', /*#__PURE__*/function () {
+  var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(event) {
+    var passwordCurrent, password, passwordConfirm;
+    return regeneratorRuntime.wrap(function _callee$(_context) {
+      while (1) {
+        switch (_context.prev = _context.next) {
+          case 0:
+            event.preventDefault();
+            document.querySelector('.btn--save-password').innerHTML = 'Updating password...';
+            passwordCurrent = document.getElementById('password-current').value;
+            password = document.getElementById('password').value;
+            passwordConfirm = document.getElementById('password-confirm').value;
+            _context.next = 7;
+            return (0, _updateSettings.updateSettings)({
+              passwordCurrent: passwordCurrent,
+              password: password,
+              passwordConfirm: passwordConfirm
+            }, 'password');
 
-if (logOutBtn) addEventListener('click', _login.logout);
+          case 7:
+            document.querySelector('.btn--save-password').innerHTML = 'Save password';
+            document.getElementById('password-current').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('password-confirm').value = '';
 
-if (userDataForm) {
-  userDataForm.addEventListener('submit', function (event) {
-    event.preventDefault();
-    var form = new FormData();
-    form.append('name', document.getElementById('name').value);
-    form.append('email', document.getElementById('email').value);
-    form.append('photo', document.getElementById('photo').files[0]);
-    (0, _updateSettings.updateSettings)(form, 'data');
-  });
-}
-
-if (userPasswordForm) {
-  userPasswordForm.addEventListener('submit', /*#__PURE__*/function () {
-    var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(event) {
-      var passwordCurrent, password, passwordConfirm;
-      return regeneratorRuntime.wrap(function _callee$(_context) {
-        while (1) {
-          switch (_context.prev = _context.next) {
-            case 0:
-              event.preventDefault();
-              document.querySelector('.btn--save-password').textContent = 'Updating password...';
-              passwordCurrent = document.getElementById('password-current').value;
-              password = document.getElementById('password').value;
-              passwordConfirm = document.getElementById('password-confirm').value;
-              _context.next = 7;
-              return (0, _updateSettings.updateSettings)({
-                passwordCurrent: passwordCurrent,
-                password: password,
-                passwordConfirm: passwordConfirm
-              }, 'password');
-
-            case 7:
-              document.querySelector('.btn--save-password').textContent = 'Save password';
-              document.getElementById('password-current').value = '';
-              document.getElementById('password').value = '';
-              document.getElementById('password-confirm').value = '';
-
-            case 11:
-            case "end":
-              return _context.stop();
-          }
+          case 11:
+          case "end":
+            return _context.stop();
         }
-      }, _callee);
-    }));
+      }
+    }, _callee);
+  }));
 
-    return function (_x) {
-      return _ref.apply(this, arguments);
-    };
-  }());
-}
-
+  return function (_x) {
+    return _ref.apply(this, arguments);
+  };
+}());
 if (bookBtn) bookBtn.addEventListener('click', function (event) {
-  event.target.textContent = 'Processing...';
+  // event.preventDefault();
+  event.target.innerHTML = 'Processing...';
   var tourId = event.target.dataset.tourId;
   (0, _stripe.bookTour)(tourId);
 });
@@ -9076,7 +9066,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "49304" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "57669" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
@@ -9253,4 +9243,4 @@ function hmrAcceptRun(bundle, id) {
   }
 }
 },{}]},{},["../../node_modules/parcel-bundler/src/builtins/hmr-runtime.js","index.js"], null)
-//# sourceMappingURL=/bundle.js.map
+//# sourceMappingURL=/js/bundle.js.map

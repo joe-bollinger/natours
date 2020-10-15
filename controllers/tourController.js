@@ -2,7 +2,7 @@ const multer = require('multer');
 const sharp = require('sharp');
 const Tour = require('../models/tourModel');
 const catchAsync = require('../utils/catchAsync');
-const factory = require('./handlerFactory.js');
+const factory = require('./handlerFactory');
 const AppError = require('../utils/appError');
 
 const multerStorage = multer.memoryStorage();
@@ -11,7 +11,7 @@ const multerFilter = (req, file, cb) => {
   if (file.mimetype.startsWith('image')) {
     cb(null, true);
   } else {
-    cb(new AppError('Not an image. Please upload only images.', 400), false);
+    cb(new AppError('Not an image! Please upload only images.', 400), false);
   }
 };
 
@@ -25,12 +25,13 @@ exports.uploadTourImages = upload.fields([
   { name: 'images', maxCount: 3 },
 ]);
 
-exports.resizeTourImages = catchAsync(async (req, res, next) => {
-  // console.log(req.files);
+// upload.single('image') req.file
+// upload.array('images', 5) req.files
 
+exports.resizeTourImages = catchAsync(async (req, res, next) => {
   if (!req.files.imageCover || !req.files.images) return next();
 
-  // 1) Cover Image
+  // 1) Cover image
   req.body.imageCover = `tour-${req.params.id}-${Date.now()}-cover.jpeg`;
   await sharp(req.files.imageCover[0].buffer)
     .resize(2000, 1333)
@@ -38,8 +39,9 @@ exports.resizeTourImages = catchAsync(async (req, res, next) => {
     .jpeg({ quality: 90 })
     .toFile(`public/img/tours/${req.body.imageCover}`);
 
-  // 2) Tour Images
+  // 2) Images
   req.body.images = [];
+
   await Promise.all(
     req.files.images.map(async (file, i) => {
       const filename = `tour-${req.params.id}-${Date.now()}-${i + 1}.jpeg`;
@@ -79,7 +81,7 @@ exports.getTourStats = catchAsync(async (req, res, next) => {
       $group: {
         _id: { $toUpper: '$difficulty' },
         numTours: { $sum: 1 },
-        numRates: { $sum: '$ratingsQuantity' },
+        numRatings: { $sum: '$ratingsQuantity' },
         avgRating: { $avg: '$ratingsAverage' },
         avgPrice: { $avg: '$price' },
         minPrice: { $min: '$price' },
@@ -90,9 +92,10 @@ exports.getTourStats = catchAsync(async (req, res, next) => {
       $sort: { avgPrice: 1 },
     },
     // {
-    //   $match: { _id: { $ne: 'EASY' } },
-    // },
+    //   $match: { _id: { $ne: 'EASY' } }
+    // }
   ]);
+
   res.status(200).json({
     status: 'success',
     data: {
@@ -147,6 +150,8 @@ exports.getMonthlyPlan = catchAsync(async (req, res, next) => {
   });
 });
 
+// /tours-within/:distance/center/:latlng/unit/:unit
+// /tours-within/233/center/34.111745,-118.113491/unit/mi
 exports.getToursWithin = catchAsync(async (req, res, next) => {
   const { distance, latlng, unit } = req.params;
   const [lat, lng] = latlng.split(',');
@@ -156,11 +161,12 @@ exports.getToursWithin = catchAsync(async (req, res, next) => {
   if (!lat || !lng) {
     next(
       new AppError(
-        'Please provide the latitude and longitude in the format lat,lng',
+        'Please provide latitutr and longitude in the format lat,lng.',
         400
       )
     );
   }
+
   const tours = await Tour.find({
     startLocation: { $geoWithin: { $centerSphere: [[lng, lat], radius] } },
   });
@@ -183,7 +189,7 @@ exports.getDistances = catchAsync(async (req, res, next) => {
   if (!lat || !lng) {
     next(
       new AppError(
-        'Please provide the latitude and longitude in the format lat,lng',
+        'Please provide latitutr and longitude in the format lat,lng.',
         400
       )
     );
@@ -197,7 +203,7 @@ exports.getDistances = catchAsync(async (req, res, next) => {
           coordinates: [lng * 1, lat * 1],
         },
         distanceField: 'distance',
-        distanceMuliplier: multiplier,
+        distanceMultiplier: multiplier,
       },
     },
     {
